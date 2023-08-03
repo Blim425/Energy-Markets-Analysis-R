@@ -1,0 +1,12 @@
+# Ignore R environment files
+.RData
+.Rhistory
+
+# Ignore RStudio specific settings
+.Rproj.user/
+  
+# Ignore files in a subdirectory called "data"
+data/
+
+# Ignore log files
+*.log
