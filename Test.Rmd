@@ -1,0 +1,43 @@
+---
+title: Energy Markets Analysis
+author: Bryce Lim
+date: Start date 01/06/23
+output:
+  html_document:
+    toc: true
+    toc_depth: 2
+    toc_float:
+      collapsed: false
+      smooth_scroll: false
+---
+
+
+```{r setup, warning = FALSE, message=FALSE}
+### Load Libraries ###
+library(yaml)
+library(tidyverse)
+library(lubridate)
+library(data.table)
+library(plotly)
+library(sf)
+
+### Load config ###
+config <- yaml::yaml.load_file("Config.yml")
+```
+
+```{r Load data}
+### Load the raw data ###
+RT_Geo_Data <- st_read(config$data$GEO_DATA)
+RT_POC_Data <- fread(config$data$POC_INFO)
+```
+
+
+```{r}
+plot(RT_Geo_Data)
+```
+
+
+```{r}
+WT_POC_data <- RT_POC_Data[,c(4,11,12,13,16,17)]
+```
+

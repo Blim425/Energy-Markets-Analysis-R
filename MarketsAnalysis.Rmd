@@ -6,13 +6,13 @@ output:
   html_document:
     toc: true
     toc_depth: 2
-    toc_float: true
+    toc_float:
       collapsed: false
       smooth_scroll: false
 ---
 
 
-```{r setup}
+```{r setup, warning = FALSE, message=FALSE}
 ### Load Libraries ###
 library(yaml)
 library(tidyverse)
@@ -28,6 +28,9 @@ config <- yaml::yaml.load_file("Config.yml")
 ### Load the raw data ###
 RT_OTA_BEN <- fread(config$data$OTA_BEN)
 ```
+
+
+## Monthly Nationally Spot Price
 
 ```{r Analysis}
 # Wrangle the data - change date into lubridate and add year month
@@ -52,7 +55,8 @@ FP_OTA_BEN_Monthly <- WT_OTA_BEN_Monthly %>% plot_ly(
   # name = '',
   type = 'scatter',
   mode = 'line',
-  color = ~PointOfConnection
+  color = ~PointOfConnection,
+  colors = c("deepskyblue", "darkorange")
 )
 FP_OTA_BEN_Monthly <- FP_OTA_BEN_Monthly %>% rangeslider() %>%
 layout(

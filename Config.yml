@@ -1,2 +1,5 @@
 data:
-  OTA_BEN: 'Data/OTABEN_PRICES.csv' 
+  OTA_BEN: 'Data/OTABEN_PRICES.csv'
+  GEO_DATA: 'Data/NZTM_GeoJSON_Zone.JSON'
+  POC_INFO: 'Data/20230910_NetworkSupplyPointsTable.csv'
+ 
