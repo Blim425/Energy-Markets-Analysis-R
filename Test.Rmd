@@ -21,6 +21,10 @@ library(data.table)
 library(plotly)
 library(sf)
 
+library(dismo)
+library(tmap)
+
+
 ### Load config ###
 config <- yaml::yaml.load_file("Config.yml")
 ```
@@ -29,15 +33,65 @@ config <- yaml::yaml.load_file("Config.yml")
 ### Load the raw data ###
 RT_Geo_Data <- st_read(config$data$GEO_DATA)
 RT_POC_Data <- fread(config$data$POC_INFO)
+RT_2022_2023_Prices <- fread(config$data$PRICE_2022)
+```
+
+
+```{r clean Data}
+# Clean the 2022 price data
+WT_2022_2023_Prices <- RT_2022_2023_Prices %>% 
+  group_by(PointOfConnection,TradingDate) %>%
+  summarize(Daily_Price = mean(DollarsPerMegawattHour))
+
+# Clear raw data from environment
+rm(RT_2022_2023_Prices)
+
+# Extract the Unique trading points that are traded
+WT_TRADED_POC <- WT_2022_2023_Prices$PointOfConnection %>% 
+   unique()
+
+# Clean the POC data
+WT_POC_Data <- RT_POC_Data[,c(4,11,12,13,16,17)]
+WT_POC_Data <- WT_POC_Data %>% 
+  dplyr::filter(`POC code` %in% WT_TRADED_POC) %>%
+  dplyr::distinct(`POC code`, .keep_all = TRUE) %>%
+  na.omit()
+
+WT_POC_Data = st_as_sf(WT_POC_Data, coords=c('NZTM easting','NZTM northing'),crs=2193)
+# WT_POC_Data = st_transform(WT_POC_Data, 2193)
+
+
+
+```
+
+
+
+```{r Geometries}
+# Fix erronous geometries
+RT_Geo_Data[,3] <- lapply(RT_Geo_Data[,3], st_make_valid)
+
+# Interactive viewing
+tmap_mode("view")
+my_dots <- tm_shape(WT_POC_Data) + tm_dots() 
+my_dots
+
+my_map <- tm_shape(st_union(RT_Geo_Data)) +
+  tm_borders(lwd = 2, col = "blue")
+my_map
+
+v = dismo::voronoi(as(WT_POC_Data,'Spatial'),RT_Geo_Data)
+tm_shape(v) + tm_polygons() + tm_legend(outside=TRUE)
+
+v = st_as_sf(v)
+v = st_set_crs(v,2193)
+v_clipped = st_intersection(v,st_union(RT_Geo_Data))
+tm_shape(v_clipped) + tm_polygons() + tm_legend(outside=TRUE)
+
+
 ```
 
 
 ```{r}
-plot(RT_Geo_Data)
-```
 
-
-```{r}
-WT_POC_data <- RT_POC_Data[,c(4,11,12,13,16,17)]
 ```
 
